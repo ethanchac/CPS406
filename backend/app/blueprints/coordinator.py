@@ -307,16 +307,14 @@ def flag_student(student_id):
 @require_role('coordinator')
 def get_student_flags(student_id):
     supabase = get_supabase()
-    result = supabase.table('exception_flags').select(
-        '*, job_assignments(company_name, work_term_id)'
-    ).eq('job_assignments.work_terms.student_id', student_id).execute()
+    # Get all work term IDs for this student
+    wt_result = supabase.table('work_terms').select('id').eq('student_id', student_id).execute()
+    if not wt_result.data:
+        return jsonify([])
+    wt_ids = [w['id'] for w in wt_result.data]
 
-    # Simpler query via job_assignments
-    jobs = supabase.table('job_assignments').select('id').eq(
-        'work_term_id',
-        supabase.table('work_terms').select('id').eq('student_id', student_id)
-    ).execute()
-
+    # Get job assignment IDs for those work terms
+    jobs = supabase.table('job_assignments').select('id').in_('work_term_id', wt_ids).execute()
     if not jobs.data:
         return jsonify([])
 
