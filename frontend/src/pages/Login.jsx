@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function Login() {
   const { signIn } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const registered = searchParams.get('registered') === '1'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -37,6 +39,11 @@ export default function Login() {
           <h1 className="text-3xl font-bold text-gray-900">TMU Co-op Portal</h1>
           <p className="mt-2 text-gray-500">Sign in to your account</p>
         </div>
+        {registered && (
+          <div role="status" className="mb-4 bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3 rounded-lg">
+            Account created successfully. Sign in with your new credentials.
+          </div>
+        )}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
           <form onSubmit={handleSubmit} noValidate>
             <div className="mb-5">
