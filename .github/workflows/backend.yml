@@ -1,0 +1,33 @@
+name: Backend Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest pytest-flask flask-mail
+
+      - name: Run tests
+        env:
+          SUPABASE_URL: mock_url
+          SUPABASE_SERVICE_ROLE_KEY: mock_key
+          SUPABASE_JWT_SECRET: test-secret
+          FLASK_SECRET_KEY: test-flask-key
+        run: python -m pytest tests/ -v
